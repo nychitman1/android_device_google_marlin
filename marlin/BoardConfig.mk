@@ -17,6 +17,7 @@ TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_ABI2 :=
 #TODO: add kryo support? TARGET_CPU_VARIANT := kryo
 TARGET_CPU_VARIANT := generic
+TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
 
 TARGET_2ND_ARCH := arm
 TARGET_2ND_ARCH_VARIANT := armv7-a-neon
@@ -115,8 +116,11 @@ BOARD_KERNEL_PAGESIZE    := 4096
 BOARD_KERNEL_TAGS_OFFSET := 0x02000000
 BOARD_RAMDISK_OFFSET     := 0x02200000
 
+TARGET_KERNEL_CONFIG := marlin_defconfig
+TARGET_KERNEL_SOURCE := kernel/google/pixel
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_ARCH := arm64
+BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android-
 TARGET_USES_UNCOMPRESSED_KERNEL := false
 
@@ -151,7 +155,7 @@ ifeq ($(HOST_OS),linux)
   ifeq ($(WITH_DEXPREOPT),)
     WITH_DEXPREOPT := true
     WITH_DEXPREOPT_PIC := true
-    ifneq ($(TARGET_BUILD_VARIANT),user)
+    ifneq ($(TARGET_BUILD_VARIANT),userdebug)
       # Retain classes.dex in APK's for non-user builds
       DEX_PREOPT_DEFAULT := nostripping
     endif
@@ -194,6 +198,10 @@ BOARD_USES_SYSTEM_OTHER_ODEX := true
 -include vendor/google_devices/marlin/BoardConfigVendor.mk
 # Build a separate vendor.img
 TARGET_COPY_OUT_VENDOR := vendor
+BOARD_NEEDS_VENDORIMAGE_SYMLINK := true
+
+# Enable workaround for slow rom flash
+BOARD_SUPPRESS_SECURE_ERASE := true
 
 #NFC
 NXP_CHIP_TYPE := PN551
